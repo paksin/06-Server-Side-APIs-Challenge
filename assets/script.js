@@ -17,6 +17,8 @@ var temp = 0;
 var humidity = 0;
 var windSpeed = 0;
 
+// Applies event listener for button clicks to all Search History Buttons
+
 var historySearcher = function () {
     var searchHistoryButtonEl = document.querySelector("#searchHistory").children;
 
@@ -33,6 +35,7 @@ var historySearcher = function () {
     };
 };
 
+// Converts name of city into longitude and latitude. Also adds, checks, and limits search history to 10 
 
 var formSubmitHandler = function (location) {
     console.log(location);
@@ -44,6 +47,8 @@ var formSubmitHandler = function (location) {
     localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
     getHistory();
 }
+
+// Checks if searchHistory exists in local storage and retrieves the list accordingly. Then, creates a button and applies it to the HTML file for every search history. 
 
 var getHistory = function () {
     console.log(searchHistory);
@@ -62,8 +67,10 @@ var getHistory = function () {
 
 }
 
+// Converts a city into longitude and latitude cordinates and calls getResult
+
 var convertGeo = function (location) {
-    var geoUrl = "http://api.openweathermap.org/geo/1.0/direct?q=" + location + "&limit=1&appid=8322ab97007a985fea243c35b56148f4";
+    var geoUrl = "https://api.openweathermap.org/geo/1.0/direct?q=" + location + "&limit=1&appid=8322ab97007a985fea243c35b56148f4";
     console.log(geoUrl);
     fetch(geoUrl)
         .then(function (response) {
@@ -85,6 +92,8 @@ var convertGeo = function (location) {
         });
 };
 
+// Combines the longitude and latitude information from above into API URLs to search on openweathermap. Then, calls getCurrent and getForecast 
+
 var getResult = function (lat, lon) {
     var currentUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=8322ab97007a985fea243c35b56148f4&units=metric";
     var forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=8322ab97007a985fea243c35b56148f4&units=metric";
@@ -92,6 +101,8 @@ var getResult = function (lat, lon) {
     getForecast(forecastUrl);
     historySearcher();
 };
+
+// Retrieves current weather data from API and apply them to the HTML file accordingly
 
 var getCurrent = function (currentUrl) {
     console.log(currentUrl);
@@ -108,7 +119,7 @@ var getCurrent = function (currentUrl) {
                     temp = data.main.temp;
                     humidity = data.main.humidity;
                     windSpeed = data.wind.speed;
-                    currentConditionEl.innerHTML = '<img src="http://openweathermap.org/img/wn/' + condition + '@2x.png" alt="Current Condition Icon">';
+                    currentConditionEl.innerHTML = '<img src="https://openweathermap.org/img/wn/' + condition + '@2x.png" alt="Current Condition Icon">';
                     currentInfoEl.textContent = cityName + " (" + date + ")";
                     currentTempEl.textContent = temp + " °C";
                     currentWindEl.textContent = windSpeed + " m/s";
@@ -122,6 +133,8 @@ var getCurrent = function (currentUrl) {
             alert('Unable to connect to OpenWeather');
         });
 };
+
+// Retrieves 5-day forecast weather data from API and apply them to the HTML file accordingly
 
 var getForecast = function (forecastUrl) {
     console.log(forecastUrl);
@@ -143,7 +156,7 @@ var getForecast = function (forecastUrl) {
                         var forcastTempEl = document.querySelector("#Temp" + i);
                         var forcastWindEl = document.querySelector("#Wind" + i);
                         var forcastHumidityEl = document.querySelector("#Humidity" + i);
-                        forcastConditionEl.innerHTML = '<img src="http://openweathermap.org/img/wn/' + condition + '@2x.png" alt="Current Condition Icon">';
+                        forcastConditionEl.innerHTML = '<img src="https://openweathermap.org/img/wn/' + condition + '@2x.png" alt="Current Condition Icon">';
                         forcastInfoEl.textContent = date;
                         forcastTempEl.textContent = temp + " °C";
                         forcastWindEl.textContent = windSpeed + " m/s";
@@ -160,6 +173,7 @@ var getForecast = function (forecastUrl) {
         });
 };
 
+// Adds event listener onto the Submit button of the search bar and calls formSubmitHandler with the City input
 
 searchFormEl.addEventListener('submit', function (event) {
     event.preventDefault();
