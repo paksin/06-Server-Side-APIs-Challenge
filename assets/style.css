@@ -1,0 +1,16 @@
+ul{
+    list-style: none;
+    min-width: 200px;
+}
+
+.forecast {
+    width: 100%;
+}
+
+body{
+    background-color: lightgray;
+}
+
+.container {
+    background-color: lightgray;
+}
