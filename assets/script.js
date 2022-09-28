@@ -6,6 +6,8 @@ var currentTempEl = document.querySelector("#currentTemp");
 var currentWindEl = document.querySelector("#currentWind");
 var currentHumidityEl = document.querySelector("#currentHumidity");
 var currentConditionEl = document.querySelector("#currentCondition");
+var searchHistoryEl = document.querySelector("#searchHistory");
+var searchHistory = localStorage.getItem("searchHistory");
 var glat = 0;
 var glon = 0;
 var cityName = "";
@@ -15,11 +17,49 @@ var temp = 0;
 var humidity = 0;
 var windSpeed = 0;
 
-var formSubmitHandler = function (event) {
-    event.preventDefault();
-    var location = searchInputEl.value.trim();
+var historySearcher = function () {
+    var searchHistoryButtonEl = document.querySelector("#searchHistory").children;
+
+    console.log(searchHistoryButtonEl);
+    console.log(searchHistoryButtonEl[0]);
+    
+    for (let i = 0; i < searchHistoryButtonEl.length; i++) {
+        searchHistoryButtonEl[i].addEventListener('click', function (event) {
+            event.preventDefault();
+            console.log(event.target);
+            var location = event.target.id;
+            formSubmitHandler(location);
+        });
+    };
+};
+
+
+var formSubmitHandler = function (location) {
     console.log(location);
     convertGeo(location);
+    if (searchHistory.length > 9) {
+        searchHistory.pop();
+    }
+    searchHistory.unshift(location);
+    localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+    getHistory();
+}
+
+var getHistory = function () {
+    console.log(searchHistory);
+    searchHistoryEl.textContent = "";
+    if (searchHistory == null) {
+        searchHistory = [];
+        console.log(searchHistory);
+    } else {
+        searchHistory = JSON.parse(localStorage.getItem("searchHistory"));
+        for (let i = 0; i < searchHistory.length; i++) {
+            var entry = document.createElement('li');
+            entry.innerHTML = '<button class = "searchHistoryButton" id= "' + searchHistory[i] + '">' + searchHistory[i] + '</button>';
+            searchHistoryEl.appendChild(entry);
+        }
+    }
+
 }
 
 var convertGeo = function (location) {
@@ -50,6 +90,7 @@ var getResult = function (lat, lon) {
     var forecastUrl = "https://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=8322ab97007a985fea243c35b56148f4&units=metric";
     getCurrent(currentUrl);
     getForecast(forecastUrl);
+    historySearcher();
 };
 
 var getCurrent = function (currentUrl) {
@@ -68,7 +109,7 @@ var getCurrent = function (currentUrl) {
                     humidity = data.main.humidity;
                     windSpeed = data.wind.speed;
                     currentConditionEl.innerHTML = '<img src="http://openweathermap.org/img/wn/' + condition + '@2x.png" alt="Current Condition Icon">';
-                    currentInfoEl.textContent = cityName + " (" + date +")";
+                    currentInfoEl.textContent = cityName + " (" + date + ")";
                     currentTempEl.textContent = temp + " °C";
                     currentWindEl.textContent = windSpeed + " m/s";
                     currentHumidityEl.textContent = humidity + " %";
@@ -119,4 +160,13 @@ var getForecast = function (forecastUrl) {
         });
 };
 
-searchFormEl.addEventListener('submit', formSubmitHandler);
+
+searchFormEl.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var location = searchInputEl.value.trim();
+    formSubmitHandler(location);
+});
+
+getHistory();
+historySearcher();
+
